@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
-var {generateMessage} = require('./utils/message');
+var {generateMessage, generateLocationMessage} = require('./utils/message');
 const publicPath = path.join(__dirname + 'server', '..', 'public');
 // this is for heroku
 const port = process.env.PORT || 3000;
@@ -29,14 +29,26 @@ io.on('connection', (socket) => {
 
     socket.on('createMessage', (message, callback) => {
         console.log('Create message', message);
-        io.emit('newMessage', generateMessage(message.from, message.text));
+        deliverMessage(io, message);
         callback('This is from the server');
+    });
+
+    socket.on('createLocationMessage', (coords) =>{
+        let message = {
+            from: 'Admin',
+            text: ``
+        };
+        io.emit('newLocationMessage', generateLocationMessage("Admin", coords.latitude, coords.longitude))
     });
 
     socket.on('disconnect', () => {
         console.log('User disconnected');
     });
 });
+
+function deliverMessage(io, message) {
+    io.emit('newMessage', generateMessage(message.from, message.text));
+}
 
 server.listen(port, () => {
     console.log('Server is up on port ' + port);
