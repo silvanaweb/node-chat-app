@@ -20,7 +20,12 @@
         $('#messages').append(li);
     }
 
-
+    if ("geolocation" in navigator) {
+        console.log('geolocation available');
+    } else {
+        console.log('geolocation NOT available');
+        /* geolocation IS NOT available */
+      }
 
 
     $('#myform').on('submit', function (e) {
