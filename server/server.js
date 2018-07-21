@@ -3,6 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
+var {generateMessage} = require('./utils/message');
 const publicPath = path.join(__dirname + 'server', '..', 'public');
 // this is for heroku
 const port = process.env.PORT || 3000;
@@ -16,13 +17,20 @@ app.use(express.static(publicPath));
 io.on('connection', (socket) => {
     console.log('new user connected');
 
-    socket.on('createMessage', (message) => {
+    socket.emit(
+        'newMessage',
+        generateMessage("Admin","Welcome to the chat App")
+    );
+    // send the messege to all except the socket
+    socket.broadcast.emit(
+        'newMessage',
+        generateMessage("Admin", "New user joined")
+    );
+
+    socket.on('createMessage', (message, callback) => {
         console.log('Create message', message);
-        io.emit('newMessage', {
-            from: message.from,
-            text: message.text,
-            createdAt: new Date().getTime()
-        })
+        io.emit('newMessage', generateMessage(message.from, message.text));
+        callback('This is from the server');
     });
 
     socket.on('disconnect', () => {

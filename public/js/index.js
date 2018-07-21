@@ -1,4 +1,6 @@
-var socket = io();
+(function ($) {
+
+    var socket = io();
 
     socket.on('connect', () => {
         console.log('Connected to server');
@@ -7,6 +9,31 @@ var socket = io();
         console.log('Diconnected from server');
     });
 
-    socket.on('newMessage', function(data) {
+    socket.on('newMessage', function (data) {
         console.log('new message', data);
+        addMessageToList(data);
     });
+
+    function addMessageToList(message) {
+        var li = $('<li></li>');
+        li.text(`${message.from}: ${message.text}`);
+        $('#messages').append(li);
+    }
+
+
+
+
+    $('#myform').on('submit', function (e) {
+        e.preventDefault();
+        socket.emit(
+            'createMessage',
+            {
+                from: "Frank",
+                text: $('#message').val()
+            },
+            function (data) {
+                console.log('Messae sent:', data);
+            }
+        );
+    });
+})(jQuery);
