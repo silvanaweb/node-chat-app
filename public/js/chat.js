@@ -1,10 +1,11 @@
 (function ($) {
-
+    var myName = "Guest";
     var socket = io();
 
     socket.on('connect', () => {
         console.log('Connected to server');
-        var params = $.deparam(window.location.serach);
+        var params = $.deparam(window.location.search);
+        myName = params.name;
         socket.emit('join', params, function(err) {
             if (err) {
                 alert(err);
@@ -83,7 +84,7 @@
         socket.emit(
             'createMessage',
             {
-                from: "Frank",
+                from: myName,
                 text: msgBox.val()
             },
             function (data) {
